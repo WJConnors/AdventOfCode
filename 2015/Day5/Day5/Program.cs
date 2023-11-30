@@ -5,7 +5,47 @@ string? rootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Lo
 String[] text = File.ReadAllLines(rootDirectory + "/text.txt");
 
 int nice = 0;
-char[] vowelArray = ['a', 'e', 'i', 'o', 'u'];
+
+foreach (string line in text)
+{
+    Boolean twice = false;
+    Boolean repeats = false;
+    List<String> pairs = new List<String>();
+    char[] previous = ['1', '1'];
+
+    foreach (char c in line)
+    { 
+        if ( c == previous[0]) { repeats = true; }
+
+        pairs.Add(new string(previous));
+
+        previous[0] = previous[1];
+        previous[1] = c;
+
+        pairs.Add(new string(previous));
+    }
+
+    foreach (String pair in pairs)
+    {
+        if (line.Contains(pair)) {
+            twice = true;
+        }
+    }
+
+    if (twice && repeats) { nice++; }
+
+}
+
+Console.WriteLine(nice);
+
+
+
+
+
+
+
+
+/*char[] vowelArray = ['a', 'e', 'i', 'o', 'u'];
 string[] badArray = ["ab", "cd", "pq", "xy"];
 
 foreach (string line in text)
@@ -35,4 +75,4 @@ foreach (string line in text)
 
 }
 
-Console.WriteLine(nice);
+Console.WriteLine(nice);*/
