@@ -5,7 +5,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 string? rootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 string[] text = File.ReadAllLines(rootDirectory + "/text.txt");
 //text = ["two1nine", "eightwothree", "abcone2threexyz", "xtwone3four", "4nineeightseven2", "zoneight234", "7pqrstsixteen"];
-text = ["twofivefourb5four"];
+//text = ["twofivefourb5four"];
 
 int total = 0;
 string[] digits = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
@@ -48,8 +48,6 @@ foreach (string line in text)
     }
 
     string num = first.ToString() + last.ToString();
-    Console.WriteLine(line);
-    Console.WriteLine(num);
     total += Int32.Parse(num);
 }
 
@@ -65,16 +63,12 @@ void StringDigit(int curDigit, string line, string digit, int firstIndex)
             first = curDigit;
             firstpos = index + firstIndex;
         }
-        Console.WriteLine(index + firstIndex);
-        Console.WriteLine(lastpos);
         if (index + firstIndex > lastpos || lastpos == -1)
         {
             last = curDigit;
             lastpos = index + firstIndex;
         }
         string sub = line.Substring(index + digit.Length);
-        Console.WriteLine(sub);
-        StringDigit(curDigit, sub, digit, firstIndex + index);
-
+        StringDigit(curDigit, sub, digit, firstIndex + index + digit.Length);
     }
 }
