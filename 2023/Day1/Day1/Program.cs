@@ -65,7 +65,7 @@ void StringDigit(int curDigit, string line, string digit, int firstIndex)
             first = curDigit;
             firstpos = index + firstIndex;
         }
-        Console.WriteLine(index);
+        Console.WriteLine(index + firstIndex);
         Console.WriteLine(lastpos);
         if (index + firstIndex > lastpos || lastpos == -1)
         {
