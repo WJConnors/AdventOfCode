@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
 
 string? rootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-List<string> text = new List<string>(File.ReadAllLines(rootDirectory + "/test.txt"));
+List<string> text = new List<string>(File.ReadAllLines(rootDirectory + "/text.txt"));
 
 string seedLine = text[0].Substring(text[0].IndexOf(':') + 2);
 
-List<int> seeds = new List<int>();
+List<double> seeds = new List<double>();
 foreach (string str in seedLine.Split(' '))
 {
-    seeds.Add(int.Parse(str));
+    seeds.Add(double.Parse(str));
 }
 text.RemoveAt(0);
 
@@ -18,7 +18,6 @@ AddNewMap();
 Boolean added = false;
 foreach (string line in text)
 {
-    Console.WriteLine(line);
     if (line == "") continue;
     if (Char.IsNumber(line, 0)) {
         string[] strNums = line.Split(' ');
@@ -33,25 +32,42 @@ foreach (string line in text)
         added = true;
     } else if (added)
     {
-        Console.WriteLine("Added");
         curMap++;
+        AddNewMap();
         added = false;
     }
 }
 
-foreach (Dictionary<int, int> dict in map)
+int lowest = -1;
+foreach (int seed in seeds)
 {
-    for (int x = 0; x < dict.Count; x++)
+    int dictValue = seed;
+    foreach (Dictionary<int, int> dict in map)
     {
-        Console.WriteLine("{0} and {1}", dict.Keys.ElementAt(x), dict[dict.Keys.ElementAt(x)]);
+        dictValue = dict[dictValue];
+    }
+    if (lowest == -1 || dictValue < lowest)
+    {
+        lowest = dictValue;
     }
 }
 
+Console.WriteLine(lowest);
+
 void AddNewMap()
 {
-    map.Add(new Dictionary<int, int>());
-    foreach (int seed in seeds)
+    double max = 0;
+    foreach (Dictionary<int, int> dict in map)
     {
-        map[curMap].Add(seed, seed);
+        if (dict.Values.Max() > max)
+        {
+            max = dict.Values.Max();
+        }
+    }
+    max = Math.Max(max, seeds.Max());
+    map.Add(new Dictionary<int, int>());
+    for (int i = 0; i <= max; i++)
+    {
+        map[curMap].Add(i, i);
     }
 }
