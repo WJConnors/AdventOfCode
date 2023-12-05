@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 
 string? rootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-List<string> text = new List<string>(File.ReadAllLines(rootDirectory + "/test.txt"));
+List<string> text = new List<string>(File.ReadAllLines(rootDirectory + "/text.txt"));
 
 string seedLineStr = text[0].Substring(text[0].IndexOf(':') + 2);
 
@@ -39,9 +39,25 @@ foreach (string line in text)
     }
 }
 
+double maxDecrease = 0;
+foreach (List<(double, double, double)> map in maps)
+{
+    double curDecrease = 0;
+    foreach ((double, double, double) values in map)
+    {
+        if (values.Item1 - values.Item2 < curDecrease)
+        {
+            curDecrease = values.Item1 - values.Item2;
+        }
+    }
+    maxDecrease += curDecrease;
+}
+Console.WriteLine(maxDecrease);
+
 double lowest = 0;
 foreach ((double, double) pair in seedPairs)
 {
+    Console.WriteLine(pair);
     for (int i = 0; i < pair.Item2; i++)
     {
         double seed = pair.Item1 + i;
@@ -49,14 +65,14 @@ foreach ((double, double) pair in seedPairs)
         {
             foreach ((double, double, double) values in map)
             {
-                if (i >= values.Item2 && i <= values.Item2 + values.Item3)
+                if (seed >= values.Item2 && seed < values.Item2 + values.Item3)
                 {
-                    seed = values.Item1 + (i - values.Item1);
+                    seed = seed + (values.Item1 - values.Item2);
                     break;
                 }
             }
         }
-        if (lowest == 0 || i < lowest)
+        if (lowest == 0 || seed < lowest)
         {
             lowest = seed;
         }
