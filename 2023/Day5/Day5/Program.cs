@@ -12,16 +12,17 @@ foreach (string str in seedLine.Split(' '))
 }
 text.RemoveAt(0);
 
-List<Dictionary<int, int>> map = new List<Dictionary<int, int>>();
+List<Dictionary<double, double>> map = new List<Dictionary<double, double>>();
 int curMap = 0;
 AddNewMap();
 Boolean added = false;
 foreach (string line in text)
 {
+    Console.WriteLine(line);
     if (line == "") continue;
     if (Char.IsNumber(line, 0)) {
         string[] strNums = line.Split(' ');
-        int[] nums = Array.ConvertAll(strNums, int.Parse);
+        double[] nums = Array.ConvertAll(strNums, double.Parse);
         for (int i = 0; i < nums[2]; i++)
         {
             if (map[curMap].ContainsKey(nums[1] + i))
@@ -32,17 +33,18 @@ foreach (string line in text)
         added = true;
     } else if (added)
     {
+        Console.WriteLine("added");
         curMap++;
         AddNewMap();
         added = false;
     }
 }
 
-int lowest = -1;
-foreach (int seed in seeds)
+double lowest = -1;
+foreach (double seed in seeds)
 {
-    int dictValue = seed;
-    foreach (Dictionary<int, int> dict in map)
+    double dictValue = seed;
+    foreach (Dictionary<double, double> dict in map)
     {
         dictValue = dict[dictValue];
     }
@@ -56,18 +58,22 @@ Console.WriteLine(lowest);
 
 void AddNewMap()
 {
-    double max = 0;
-    foreach (Dictionary<int, int> dict in map)
+    map.Add(new Dictionary<double, double>());
+    foreach (double seed in seeds)
     {
-        if (dict.Values.Max() > max)
+        if (!map[curMap].ContainsKey(seed))
         {
-            max = dict.Values.Max();
+            map[curMap].Add(seed, seed);
         }
     }
-    max = Math.Max(max, seeds.Max());
-    map.Add(new Dictionary<int, int>());
-    for (int i = 0; i <= max; i++)
+    foreach (Dictionary<double, double> dict in map)
     {
-        map[curMap].Add(i, i);
+        foreach (double value in dict.Values)
+        {
+            if (!map[curMap].ContainsKey(value))
+            {
+                map[curMap].Add(value, value);
+            }
+        }
     }
 }
