@@ -11,24 +11,27 @@ List<int> distances = new List<int>();
 for (int i = 0; i < time.Length; i++)
 {
     List<char> tempTime = new List<char>();
-    if (char.IsNumber(time[i]))
+    while (char.IsNumber(time[i]))
     {
         tempTime.Add(time[i]);
-        if (char.IsNumber(time[++i]))
-        {
-            tempTime.Add(time[i]);
-        }
-        times.Add(int.Parse(new string(tempTime.ToArray())));
+        if (++i == time.Length) { break; }
     }
+    if (tempTime.Count > 0) { 
+        times.Add(int.Parse(new string(tempTime.ToArray())));
+    } 
 
+}
+for (int i = 0; i < time.Length; i++)
+{
     List<char> tempDistance = new List<char>();
-    if (char.IsNumber(distance[i]))
+    while (char.IsNumber(distance[i]))
     {
         tempDistance.Add(distance[i]);
-        if (char.IsNumber(distance[++i]))
-        {
-            tempTime.Add(distance[i]);
-        }
+        if (++i == distance.Length) { break; }
+    }
+    if (tempDistance.Count > 0)
+    {
         distances.Add(int.Parse(new string(tempDistance.ToArray())));
     }
 }
+
