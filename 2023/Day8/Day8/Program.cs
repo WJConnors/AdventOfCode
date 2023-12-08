@@ -27,7 +27,7 @@ foreach (string direction in nextDirections)
 {
     string curDirection = direction;
     int i = 0;
-    double steps = 0;
+    int steps = 0;
     while (curDirection[2] != 'Z')
     {
         int index = maps.FindIndex(x => x.Item1 == curDirection);
@@ -38,13 +38,25 @@ foreach (string direction in nextDirections)
     multiples.Add(steps);
 }
 
-bool found = false;
-while (!found)
+double lcm = LCM(multiples[0], multiples[1]);
+for (int i = 1; i < multiples.Count; i++)
 {
-
+    lcm = LCM(lcm, multiples[i]);
 }
 
+Console.WriteLine(lcm);
 
+double LCM (double a, double b)
+{
+    return (a * b) / GCD(a, b);
+}
+
+double GCD(double a, double b)
+{
+    if (a == 0)
+        return b;
+    return GCD(b % a, a);
+}
 
 /*int i = 0;
 int steps = 0;
