@@ -22,7 +22,31 @@ foreach ((string, string, string) map in maps)
     }
 }
 
-int i = 0;
+List<double> multiples = [];
+foreach (string direction in nextDirections)
+{
+    string curDirection = direction;
+    int i = 0;
+    double steps = 0;
+    while (curDirection[2] != 'Z')
+    {
+        int index = maps.FindIndex(x => x.Item1 == curDirection);
+        curDirection = directions[i] == 'L' ? maps[index].Item2 : maps[index].Item3;
+        steps++;
+        i = i == directions.Length - 1 ? 0 : i + 1;
+    }
+    multiples.Add(steps);
+}
+
+bool found = false;
+while (!found)
+{
+
+}
+
+
+
+/*int i = 0;
 int steps = 0;
 bool completed = false;
 
@@ -41,4 +65,4 @@ while (!completed)
     steps++;
     i = i == directions.Length - 1 ? 0 : i + 1;
 }
-Console.WriteLine(steps);
+Console.WriteLine(steps);*/
