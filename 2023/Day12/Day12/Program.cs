@@ -33,7 +33,20 @@ for (int i = 0; i < gears.Count; i ++)
     Console.WriteLine();
 }
 
-
+for (int i = 0; i < gears.Count; i++)
+{
+    List<List<char>> output = Combinations(gears[i], groups[i]);
+    Console.WriteLine(gears[i]);
+    foreach(List<char> lc in output)
+    {
+        foreach (char c in lc)
+        {
+            Console.Write(c);
+        }
+        Console.WriteLine();
+    }
+    Console.WriteLine();
+}
 
 List<int> Arrangement(string gear)
 {
@@ -60,9 +73,9 @@ List<int> Arrangement(string gear)
     return ints;
 }
 
-List<string> Combinations(string gear, List<int> group)
+List<List<char>> Combinations(string gear, List<int> group)
 {
-    List<string> combinations = [];
+    IEnumerable<IEnumerable<char>> combinations = [];
 
     int totalBroken = group.Sum();
     int foundBroken = gear.Count(x => x == '#');
@@ -79,8 +92,12 @@ List<string> Combinations(string gear, List<int> group)
     {
         combinations = intCombos.Combinations(questions, foundBroken);
     }
-
-    return combinations;
+    List<List<char>> listCombos = [];
+    foreach (IEnumerable<char> combos in combinations)
+    {
+        listCombos.Add(combos.ToList());
+    }
+    return listCombos;
 }
 
 static class intCombos
