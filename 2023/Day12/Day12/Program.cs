@@ -22,30 +22,11 @@ for (int i = 0; i < strGroups.Count; i++)
     }
 }
 
-for (int i = 0; i < gears.Count; i ++)
-{
-    Console.WriteLine(gears[i]);
-    List<int> arrangement = Arrangement(gears[i]);
-    foreach (int j in arrangement)
-    {
-        Console.WriteLine(j);
-    }
-    Console.WriteLine();
-}
-
+List<List<List<int>>> permutations = [];
 for (int i = 0; i < gears.Count; i++)
 {
-    List<List<char>> output = Combinations(gears[i], groups[i]);
-    Console.WriteLine(gears[i]);
-    foreach(List<char> lc in output)
-    {
-        foreach (char c in lc)
-        {
-            Console.Write(c);
-        }
-        Console.WriteLine();
-    }
-    Console.WriteLine();
+    permutations.Add(new List<List<int>>());
+    permutations[i].Add(Combinations(gears[i], groups[i]));    
 }
 
 List<int> Arrangement(string gear)
@@ -73,27 +54,28 @@ List<int> Arrangement(string gear)
     return ints;
 }
 
-List<List<char>> Combinations(string gear, List<int> group)
+List<List<int>> Combinations(string gear, List<int> group)
 {
-    IEnumerable<IEnumerable<char>> combinations = [];
+    IEnumerable<IEnumerable<int>> combinations = [];
 
     int totalBroken = group.Sum();
     int foundBroken = gear.Count(x => x == '#');
-    string questions = "";
+    List<int> questions = [];
     for (int i = 0; i < gear.Length; i++)
     {
         if (gear[i] == '?')
         {
-            questions += i.ToString();
+            questions.Add(i);
         }
     }
     int toAdd = totalBroken - foundBroken;
     if (questions.Count() > 0)
     {
-        combinations = intCombos.Combinations(questions, foundBroken);
+        Console.WriteLine(questions + " " + foundBroken);
+        combinations = intCombos.GetPermutations(questions, foundBroken);
     }
-    List<List<char>> listCombos = [];
-    foreach (IEnumerable<char> combos in combinations)
+    List<List<int>> listCombos = [];
+    foreach (IEnumerable<int> combos in combinations)
     {
         listCombos.Add(combos.ToList());
     }
@@ -102,10 +84,13 @@ List<List<char>> Combinations(string gear, List<int> group)
 
 static class intCombos
 {
-    public static IEnumerable<IEnumerable<T>> Combinations<T>(this IEnumerable<T> elements, int k)
+    public static IEnumerable<IEnumerable<T>>
+    GetPermutations<T>(IEnumerable<T> list, int length)
     {
-        return k == 0 ? new[] { new T[0] } :
-          elements.SelectMany((e, i) =>
-            elements.Skip(i + 1).Combinations(k - 1).Select(c => (new[] { e }).Concat(c)));
+        if (length == 1) return list.Select(t => new T[] { t });
+
+        return GetPermutations(list, length - 1)
+            .SelectMany(t => list.Where(e => !t.Contains(e)),
+                (t1, t2) => t1.Concat(new T[] { t2 }));
     }
 }
