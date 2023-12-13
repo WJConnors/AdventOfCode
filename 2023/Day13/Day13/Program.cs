@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using System.Reflection.PortableExecutable;
+using System.Text;
 
 string? rootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 string[] text = File.ReadAllLines(rootDirectory + "/test.txt");
@@ -16,11 +18,66 @@ foreach (string line in text)
     }
 }
 
+int total = 0;
+for (int i = 0; i < input.Count; i++)
+{
+    bool found = false;
+    List<string> temp = new List<string>(input[i]);
+    for (int j = 0; j < temp.Count; j++)
+    {
+        for (int k = j + 1; k < temp[j].Length; k++)
+        {
+            char tempChar = temp[j][k];
+            if (tempChar == '#')
+            {
+                char[] tempArray = temp[j].ToCharArray();
+                tempArray[k] = '.';
+                temp[j] = new string(tempArray);
+            } else
+            {
+                char[] tempArray = temp[j].ToCharArray();
+                tempArray[k] = '#';
+                temp[j] = new string(tempArray);
+            }
+            int hr = HoriReflection(temp);
+            int vr = VertReflection(temp);
+            if (hr != -1)
+            {
+                total += (hr + 1) * 100;
+                found = true;
+                break;
+            }
+            if (vr != -1)
+            {
+                total += vr + 1;
+                found = true;
+                break;
+            }
+            char[] tempArray = temp[j].ToCharArray();
+            tempArray[k] = tempChar;
+            temp[j] = new string(tempArray);
+        }
+        if (found) { break; }
+    }
+}
+
+/*int total = 0;
 foreach (List<string> section in input)
 {
-    Console.WriteLine(HoriReflection(section));
-    Console.WriteLine(VertReflection(section));
-}
+    int horiVal = HoriReflection(section);
+    if (horiVal != -1)
+    {
+        total += (horiVal + 1) * 100;
+    } else if (VertReflection(section) != -1)
+    {
+        total += VertReflection(section) + 1;
+    } else
+    {
+        Console.WriteLine("Error");
+    }
+}*/
+
+Console.WriteLine(total);
 
 int HoriReflection (List<string> s)
 {
@@ -35,8 +92,6 @@ int HoriReflection (List<string> s)
             int k = i + 1;
             while (j >= 0 && k < s.Count)
             {
-                Console.WriteLine(s[j]);
-                Console.WriteLine(s[k]);
                 if ((s[j] != s[k]))
                 {
                     found = -1;
@@ -59,16 +114,12 @@ int VertReflection (List<string> s)
 
     for (int i = 0; i < s[0].Length; i++)
     {
-        n.Add("");
+        StringBuilder sb = new StringBuilder("", s.Count);
         foreach (string line in s)
         {
-            n.Last().Append(line[i]);
+            sb.Append(line[i]);
         }
-    }
-
-    foreach (string line in n)
-    {
-        Console.WriteLine(line);
+        n.Add(sb.ToString());
     }
 
     found = HoriReflection(n);
