@@ -1,4 +1,6 @@
-﻿string[] input = File.ReadAllLines("test.txt");
+﻿using System.Collections.Generic;
+
+string[] input = File.ReadAllLines("test.txt");
 
 PriorityQueue<Node, int> toVisit = new();
 toVisit.Enqueue(new Node(0, 0, 0, [' ', ' ', ' '], [(0, 0)]), 0);
@@ -18,13 +20,6 @@ List<(int, int)> history = [];
 while (toVisit.Count > 0)
 {
     Node curNode = toVisit.Dequeue();
-    if (visited.Contains((curNode.X, curNode.Y, curNode.Direction[0])))
-    {
-        continue;
-    } else
-    {
-        visited.Add((curNode.X, curNode.Y, curNode.Direction[0]));
-    }
 
     Console.WriteLine(curNode.X + " " + curNode.Y + " " + curNode.Path + " " + curNode.Direction[0]  + " " + curNode.Path);
 
@@ -81,7 +76,7 @@ while (toVisit.Count > 0)
         {
             direction = 'L';
         }
-        (int, int) newNode = (curNode.X + s.Item1, curNode.Y + s.Item2);
+        (int, int) newNode = (curNode.X + s.Item1, curNode.Y + s.Item2);        
         if (newNode == limit)
         {
             continue;
@@ -122,15 +117,18 @@ while (toVisit.Count > 0)
         List<char> newDirection = new(curNode.Direction);
         newDirection.Insert(0, direction);
         List<(int, int)> newHistory = new(curNode.History) { (newNode.Item1, newNode.Item2) };
-        if (!curShortest[newNode.Item1, newNode.Item2].History.TryAdd(direction, newPath))
+        if (!curShortest[newNode.Item1, newNode.Item2].History.TryAdd([newDirection[0], newDirection[1], newDirection[0]], newPath))
         {
-            continue;
+            if (newPath > curShortest[newNode.Item1, newNode.Item2].History[[newDirection[0], newDirection[1], newDirection[0]]])
+            {
+                continue;
+            }
         }
-        foundNodes.Add(new Node(newNode.Item1, newNode.Item2, newPath, newDirection, newHistory));
-        foreach (Node n in foundNodes)
-        {
-            toVisit.Enqueue(n, n.Path);
-        }
+        foundNodes.Add(new Node(newNode.Item1, newNode.Item2, newPath, newDirection, newHistory));        
+    }
+    foreach (Node n in foundNodes)
+    {
+        toVisit.Enqueue(n, n.Path);
     }
 }
 
@@ -155,5 +153,5 @@ struct Node(int x, int y, int path, List<char> direction, List<(int, int)> histo
 
 struct CellInfo()
 {
-    public Dictionary<char, int> History = [];
+    public Dictionary<char[], int> History = [];
 }
