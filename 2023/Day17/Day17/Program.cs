@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
-
-string[] input = File.ReadAllLines("test.txt");
+﻿string[] input = File.ReadAllLines("test.txt");
 
 PriorityQueue<Node, int> toVisit = new();
-toVisit.Enqueue(new Node(0, 0, 0, [], [(0, 0)]), 0);
+toVisit.Enqueue(new Node(0, 0, 0, [' ', ' ', ' '], [(0, 0)]), 0);
 int shortestPath = int.MaxValue;
 List<(int, int)> surroundings = [(0, 1), (0, -1), (1, 0), (-1, 0)];
+List<(int, int, char)> visited = [];
 
 CellInfo[,] curShortest = new CellInfo[input.Length, input[0].Length];
 for (int i = 0; i < input.Length; i++)
@@ -20,9 +18,19 @@ List<(int, int)> history = [];
 while (toVisit.Count > 0)
 {
     Node curNode = toVisit.Dequeue();
+    if (visited.Contains((curNode.X, curNode.Y, curNode.Direction[0])))
+    {
+        continue;
+    } else
+    {
+        visited.Add((curNode.X, curNode.Y, curNode.Direction[0]));
+    }
+
+    Console.WriteLine(curNode.X + " " + curNode.Y + " " + curNode.Path + " " + curNode.Direction[0]  + " " + curNode.Path);
 
     if (curNode.X == input.Length - 1 && curNode.Y == input[0].Length - 1)
     {
+        Console.WriteLine("Found");
         if (curNode.Path < shortestPath)
         {
             shortestPath = curNode.Path;
@@ -34,27 +42,24 @@ while (toVisit.Count > 0)
         {
             continue;
         }
-        
+
     }
     (int, int) limit = (0, 0);
-    if (curNode.Direction.Count > 2)
+    if (curNode.Direction[0] == 'U' && curNode.Direction[1] == 'U' && curNode.Direction[2] == 'U')
     {
-        if (curNode.Direction[0] == 'U' && curNode.Direction[1] == 'U' && curNode.Direction[2] == 'U')
-        {
-            limit = (curNode.X -1, curNode.Y);
-        }
-        else if (curNode.Direction[0] == 'D' && curNode.Direction[1] == 'D' && curNode.Direction[2] == 'D')
-        {
-            limit = (curNode.X + 1, curNode.Y);
-        }
-        else if (curNode.Direction[0] == 'L' && curNode.Direction[1] == 'L' && curNode.Direction[2] == 'L')
-        {
-            limit = (curNode.X, curNode.Y - 1);
-        }
-        else if (curNode.Direction[0] == 'R' && curNode.Direction[1] == 'R' && curNode.Direction[2] == 'R')
-        {
-            limit = (curNode.X, curNode.Y + 1);
-        }
+        limit = (curNode.X - 1, curNode.Y);
+    }
+    else if (curNode.Direction[0] == 'D' && curNode.Direction[1] == 'D' && curNode.Direction[2] == 'D')
+    {
+        limit = (curNode.X + 1, curNode.Y);
+    }
+    else if (curNode.Direction[0] == 'L' && curNode.Direction[1] == 'L' && curNode.Direction[2] == 'L')
+    {
+        limit = (curNode.X, curNode.Y - 1);
+    }
+    else if (curNode.Direction[0] == 'R' && curNode.Direction[1] == 'R' && curNode.Direction[2] == 'R')
+    {
+        limit = (curNode.X, curNode.Y + 1);
     }
     List<Node> foundNodes = [];
     foreach ((int, int) s in surroundings)
@@ -83,7 +88,7 @@ while (toVisit.Count > 0)
         }
         if (curNode.Direction.Count > 0)
         {
-        
+
             if (curNode.Direction[0] == 'U' && direction == 'D')
             {
                 continue;
@@ -116,7 +121,7 @@ while (toVisit.Count > 0)
         }
         List<char> newDirection = new(curNode.Direction);
         newDirection.Insert(0, direction);
-        List<(int, int)> newHistory = new(curNode.History) { (newNode.Item1, newNode.Item2) };        
+        List<(int, int)> newHistory = new(curNode.History) { (newNode.Item1, newNode.Item2) };
         if (!curShortest[newNode.Item1, newNode.Item2].History.TryAdd(direction, newPath))
         {
             continue;
@@ -129,9 +134,12 @@ while (toVisit.Count > 0)
     }
 }
 
+int total = 0;
 foreach ((int, int) h in history)
 {
-    Console.WriteLine(h + " " + input[h.Item1][h.Item2]);   
+    if (h.Item1 == 0 && h.Item2 == 0) continue;
+    total += int.Parse(input[h.Item1][h.Item2].ToString());
+    Console.WriteLine(h + " " + input[h.Item1][h.Item2] + " " + total);
 }
 Console.WriteLine(shortestPath);
 
