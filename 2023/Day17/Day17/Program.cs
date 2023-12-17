@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-string[] input = File.ReadAllLines("test.txt");
+﻿string[] input = File.ReadAllLines("test.txt");
 
 PriorityQueue<Node, int> toVisit = new();
 toVisit.Enqueue(new Node(0, 0, 0, [' ', ' ', ' '], [(0, 0)]), 0);
@@ -20,8 +18,20 @@ List<(int, int)> history = [];
 while (toVisit.Count > 0)
 {
     Node curNode = toVisit.Dequeue();
-
-    Console.WriteLine(curNode.X + " " + curNode.Y + " " + curNode.Path + " " + curNode.Direction[0]  + " " + curNode.Path);
+    List<char> thisDirection = [curNode.Direction[0]];
+    if (curNode.Direction[1] == thisDirection[0])
+    {
+        thisDirection.Add(curNode.Direction[1]);
+        if (curNode.Direction[2] == thisDirection[0])
+        {
+            thisDirection.Add(curNode.Direction[2]);
+        }
+    }
+    if (!curShortest[curNode.X, curNode.Y].History.TryAdd((thisDirection), curNode.Path))
+    {
+        continue;
+    }
+    //Console.WriteLine(curNode.X + " " + curNode.Y + " " + curNode.Path + " " + curNode.Direction[0]  + " " + curNode.Path);
 
     if (curNode.X == input.Length - 1 && curNode.Y == input[0].Length - 1)
     {
@@ -117,12 +127,18 @@ while (toVisit.Count > 0)
         List<char> newDirection = new(curNode.Direction);
         newDirection.Insert(0, direction);
         List<(int, int)> newHistory = new(curNode.History) { (newNode.Item1, newNode.Item2) };
-        if (!curShortest[newNode.Item1, newNode.Item2].History.TryAdd([newDirection[0], newDirection[1], newDirection[0]], newPath))
+        List<char> curDirection = [newDirection[0]];
+        if (newDirection[1] == curDirection[0] )
         {
-            if (newPath > curShortest[newNode.Item1, newNode.Item2].History[[newDirection[0], newDirection[1], newDirection[0]]])
+            curDirection.Add(newDirection[1]);
+            if (newDirection[2] == curDirection[0])
             {
-                continue;
+                curDirection.Add(newDirection[2]);
             }
+        }
+        if (curShortest[newNode.Item1, newNode.Item2].History.ContainsKey(curDirection))
+        {
+            continue;
         }
         foundNodes.Add(new Node(newNode.Item1, newNode.Item2, newPath, newDirection, newHistory));        
     }
@@ -153,5 +169,5 @@ struct Node(int x, int y, int path, List<char> direction, List<(int, int)> histo
 
 struct CellInfo()
 {
-    public Dictionary<char[], int> History = [];
+    public Dictionary<List<char>, int> History = [];
 }
