@@ -2,15 +2,13 @@
 using System.Linq;
 using System.Reflection;
 
-string[] input = File.ReadAllLines("test.txt");
-int value = Convert.ToInt32("0x70c71", 16);
-Console.WriteLine(value);
+string[] input = File.ReadAllLines("text.txt");
 
-(int, int) curLocation = (0, 0);
-List<(int, int)> locations = [curLocation];
-List<Point> shape = [];
-shape.Add(new Point(0, 0));
-
+(long, long) curLocation = (0, 0);
+List<(long, long)> locations = [curLocation];
+List< (long, long)> shape = [];
+shape.Add((0, 0));
+long perimeter = 0;
 foreach (string line in input)
 {
     char dir = line[^2];
@@ -37,31 +35,51 @@ foreach (string line in input)
     {
         if (dir == 'U')
         {
-            curLocation.Item1--;
+            curLocation.Item2++;
         }
         else if (dir == 'D')
         {
-            curLocation.Item1++;
+            curLocation.Item2--;
         }
         else if (dir == 'R')
         {
-            curLocation.Item2++;
+            curLocation.Item1++;
         }
         else if (dir == 'L')
         {
-            curLocation.Item2--;
+            curLocation.Item1--;
         }
         locations.Add(curLocation);
+        perimeter++;
     }
-    shape.Add(new Point(curLocation.Item2, curLocation.Item1));
+    shape.Add((curLocation.Item1, curLocation.Item2));
     Console.WriteLine(curLocation);
 }
-Point[] points = shape.ToArray();
-int minX = shape.Min(p => p.X);
-int maxX = shape.Max(p => p.X);
-int minY = shape.Min(p => p.Y);
-int maxY = shape.Max(p => p.Y);
-int total = 0;
+
+long area = 0;
+int j = shape.Count - 1;
+for (int i = 0; i < shape.Count; i++)
+{
+    area += (shape[j].Item1 * shape[i].Item2) - (shape[i].Item1 * shape[j].Item2);
+    j = i;
+}
+area = Math.Abs(area) / 2;
+
+long interior = area - (perimeter / 2) + 1;
+Console.WriteLine(interior + perimeter);
+
+/*double area = 0;
+int j = shape.Count - 1;
+for (int i = 0; i < shape.Count; i++)
+{
+    area += (shape[j].Item1 + shape[i].Item1) * (shape[j].Item2 - shape[i].Item2);
+    j = i;
+}
+area = Math.Abs(area / 2);
+//area += locations.Count;
+Console.WriteLine(area);*/
+/*
+/*double total = 0;
 for (int i = minY; i < maxY + 1; i++)
 {
     for (int j = minX; j < maxX + 1; j++)
@@ -73,14 +91,19 @@ for (int i = minY; i < maxY + 1; i++)
         }
         if (IsInPolygon(points, new Point(j,i)))
         {
-            total++;
+            int count = 0;
+            while (!locations.Contains((i, j)))
+            {
+                count++;
+                j++;
+            }
+            total += count;
         }
     }
-    Console.WriteLine();
 }
-Console.WriteLine(total);
+Console.WriteLine(total);*/
 
-bool IsInPolygon(Point[] poly, Point p)
+/*bool IsInPolygon(Point[] poly, Point p)
 {
     Point p1, p2;
     bool inside = false;
@@ -119,7 +142,7 @@ bool IsInPolygon(Point[] poly, Point p)
     }
 
     return inside;
-}
+}*/
 
 
 
