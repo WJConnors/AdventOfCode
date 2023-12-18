@@ -13,10 +13,26 @@ shape.Add(new Point(0, 0));
 
 foreach (string line in input)
 {
-    char dir = line[line.Length - 1];
-    int index = line.IndexOf('X');
-    string dist = line.Substring(index + 1, line.Length - 2);
+    char dir = line[^2];
+    switch (dir) {
+        case '0':
+            dir = 'R';
+            break;
+        case '1':
+            dir = 'D';
+            break;
+        case '2':
+            dir = 'L';
+            break;
+        case '3':
+            dir = 'U';
+            break;
+    }
+    Console.WriteLine(dir);
+    int index = line.IndexOf('#');
+    string dist = line.Substring(index + 1, 5);
     int distance = Convert.ToInt32("0x" + dist, 16);
+    Console.WriteLine(distance);
     for (int i = 0; i < distance; i++)
     {
         if (dir == 'U')
@@ -53,16 +69,11 @@ for (int i = minY; i < maxY + 1; i++)
         if (locations.Contains((i, j)))
         {
             total++;
-            Console.Write("#");
             continue;
         }
         if (IsInPolygon(points, new Point(j,i)))
         {
             total++;
-            Console.Write("#");
-        } else
-        {
-            Console.Write(".");
         }
     }
     Console.WriteLine();
