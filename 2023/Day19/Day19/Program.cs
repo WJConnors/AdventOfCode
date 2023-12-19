@@ -1,4 +1,6 @@
-﻿string[] input = File.ReadAllLines("test.txt");
+﻿using System.Collections.Generic;
+
+string[] input = File.ReadAllLines("test.txt");
 
 List<string> workflows = [];
 List<string> ratings = [];
@@ -17,7 +19,7 @@ foreach (string line in input)
 List<List<string>> workflowRules = [];
 foreach (string line in workflows)
 {
-    List<string> strLst = line.Split('{').ToList();
+    List<string> strLst = [.. line.Split('{')];
     workflowRules.Add([strLst[0]]);
     strLst.RemoveAt(0);
     strLst = [.. strLst[0].Split(",")];
@@ -27,7 +29,18 @@ foreach (string line in workflows)
     }
     workflowRules.Last()[^1] = workflowRules.Last().Last().Remove(workflowRules.Last().Last().Length - 1, 1);
 }
-List<List<int>> rateVals = [];
+
+List<List<(int, int)>> firstRanges = [[(1, 4000), (1, 4000), (1, 4000), (1, 4000),]];
+int index = workflowRules.FindIndex(x => x[0] == "in");
+List<List<(int,int)>> GetRanges (List<List<(int, int)>> ranges, int index)
+{
+
+
+    return ranges;
+}
+
+
+/*List<List<int>> rateVals = [];
 foreach (string line in ratings)
 {
     List<string> strList = [.. line.Split(",")];
@@ -47,57 +60,65 @@ foreach (string line in ratings)
     rateVals.Add(intList);
 }
 
-int index = workflowRules.FindIndex(x => x[0] == "in");
-Console.WriteLine(index);
-List<string> curRules = workflowRules[index];
-string newFlow = "in";
 double total = 0;
 foreach (List<int> part in rateVals)
 {
-    for (int i = 0; i < curRules.Count; i++)
+    int index = workflowRules.FindIndex(x => x[0] == "in");
+    string newFlow = "in";
+    List<string> curRules = workflowRules[index];
+    while (true)
     {
-        bool found = false;
-        if (i == curRules.Count - 1)
+        for (int i = 1; i < curRules.Count; i++)
         {
-            found = true;
-            newFlow = curRules[i];
-            break;
-        }
-
-        int cat = CharToCat(curRules[i][0]);
-        char op = curRules[i][1];
-        string strVal = "";
-        for (int j = 2; j  < curRules.Count; j++)
-        {
-            if (char.IsDigit(curRules[i][j]))
+            bool found = false;
+            if (i == curRules.Count - 1)
             {
-                strVal += curRules[i][j];
+                found = true;
+                newFlow = curRules[i];
+                break;
+            }
+
+            int cat = CharToCat(curRules[i][0]);
+            char op = curRules[i][1];
+            string strVal = "";
+            for (int j = 2; j < curRules[i].Length; j++)
+            {
+                if (char.IsDigit(curRules[i][j]))
+                {
+                    strVal += curRules[i][j];
+                }
+            }
+            int val = int.Parse(strVal);
+            found = op switch
+            {
+                '<' => part[cat] < val,
+                '>' => part[cat] > val,
+                _ => throw new Exception("incorrect op: " + op),
+            };
+            if (found)
+            {
+                newFlow = curRules[i].Split(':')[1];
+                break;
             }
         }
-        int val = int.Parse(strVal);
-        found = op switch
+        if (newFlow == "A")
         {
-            '<' => part[cat] < val,
-            '>' => part[cat] < val,
-            _ => throw new Exception("incorrect op: " + op),
-        };
-        if (found)
-        {
-            newFlow = curRules[i].Split(':')[1];
+            total += part.Sum();
             break;
         }
-    }
-    if (newFlow == "A")
-    {
-        total += part.Sum();
-        continue;
-    } else if ( newFlow == "R")
-    {
-        continue;
-    } else
-    {
+        else if (newFlow == "R")
+        {
+            break;
+        }
+        else
+        {
+            index = workflowRules.FindIndex(x => x[0] == newFlow);
+            curRules = workflowRules[index];
+        }
     }
 }
+
+Console.WriteLine(total);*/
 
 static int CharToCat(char c)
 {
