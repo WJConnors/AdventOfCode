@@ -30,15 +30,213 @@ foreach (string line in workflows)
     workflowRules.Last()[^1] = workflowRules.Last().Last().Remove(workflowRules.Last().Last().Length - 1, 1);
 }
 
-List<List<(int, int)>> firstRanges = [[(1, 4000), (1, 4000), (1, 4000), (1, 4000),]];
-int index = workflowRules.FindIndex(x => x[0] == "in");
-List<List<(int,int)>> GetRanges (List<List<(int, int)>> ranges, int index)
+foreach(List<string> rule in workflowRules)
 {
-
-
-    return ranges;
+    foreach (string str in rule)
+    {
+        Console.Write(str + " ");
+    }
+    Console.WriteLine();
 }
 
+List<List<(int, int)>> firstRanges = [[(1, 4000), (1, 4000), (1, 4000), (1, 4000),]];
+int index = workflowRules.FindIndex(x => x[0] == "in");
+
+List<List<(int, int)>> ranges = GetRanges(firstRanges[0], index);
+Console.WriteLine(ranges.Count);
+foreach (List<(int, int)> range in ranges)
+{
+    foreach ((int, int) val in range)
+    {
+        Console.Write(val + " ");
+    }
+    Console.WriteLine();
+}
+
+
+
+List<List<(int,int)>> GetRanges (List<(int, int)> ranges, int index)
+{
+    Console.WriteLine(index);
+    foreach ((int, int) val in ranges)
+    {
+        Console.Write(val + " ");
+    }
+    Console.WriteLine();
+    List<List<(int, int)>> output = [];
+    List<(int, int)> range = ranges;
+    List<string>  curRules = workflowRules[index];
+    for (int i = 1; i < curRules.Count; i++)
+    {
+        Console.WriteLine(curRules[i]);
+        string newFlow = "";
+        bool found = false;
+        if (i == curRules.Count - 1)
+        {
+            found = true;
+            newFlow = curRules[i];
+            if (newFlow == "A")
+            {
+                Console.WriteLine("found");
+                foreach ((int, int) v in range)
+                {
+                    Console.Write(v + " ");
+                }
+                Console.WriteLine();
+                output.Add(range);
+                continue;
+            } else if (newFlow == "R")
+            {
+                continue;
+            }
+            List<List<(int, int)>> curOutput = GetRanges(range, workflowRules.FindIndex(x => x[0] == newFlow));
+            foreach (List<(int, int)> r in curOutput)
+            {
+                output.Add(r);
+            }
+            continue;
+        }
+
+        int cat = CharToCat(curRules[i][0]);
+        char op = curRules[i][1];
+        string strVal = "";
+        for (int j = 2; j < curRules[i].Length; j++)
+        {
+            if (char.IsDigit(curRules[i][j]))
+            {
+                strVal += curRules[i][j];
+            }
+        }
+        int val = int.Parse(strVal);
+        (int, int) catVals = ranges[cat];
+        if (val >= catVals.Item1 && val <= catVals.Item2)
+        {
+            (int, int) lower;
+            (int, int) upper;
+
+            switch (op)
+            {
+                case '<':
+                    newFlow = curRules[i].Split(':')[1];
+                    lower = (catVals.Item1, int.Min(catVals.Item2, val -1));
+                    upper = (val, catVals.Item2);
+                    List<(int, int)> newRange1 = new(range);
+                    range[cat] = upper;
+                    newRange1[cat] = lower;
+                    if (newFlow == "A")
+                    {
+                        Console.WriteLine("found");
+                        foreach ((int, int) v in range)
+                        {
+                            Console.Write(v + " ");
+                        }
+                        Console.WriteLine();
+                        output.Add(newRange1);
+                    }
+                    else if (newFlow == "R")
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        List<List<(int, int)>> curOutput = GetRanges(range, workflowRules.FindIndex(x => x[0] == newFlow));
+                        foreach (List<(int, int)> r in curOutput)
+                        {
+                            output.Add(r);
+                        }
+                    }
+                    break;
+                case '>':
+                    newFlow = curRules[i].Split(':')[1];
+                    lower = (catVals.Item1, val);
+                    upper = (val + 1, catVals.Item2);
+                    List<(int, int)> newRange2 = new(range);
+                    range[cat] = lower;
+                    newRange2[cat] = upper;
+                    if (newFlow == "A")
+                    {
+                        Console.WriteLine("found");
+                        foreach ((int, int) v in range)
+                        {
+                            Console.Write(v + " ");
+                        }
+                        Console.WriteLine();
+                        output.Add(newRange2);
+                    }
+                    else if (newFlow == "R")
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        List<List<(int, int)>> curOutput = GetRanges(range, workflowRules.FindIndex(x => x[0] == newFlow));
+                        foreach (List<(int, int)> r in curOutput)
+                        {
+                            output.Add(r);
+                        }
+                    }
+                    break;
+                default:
+                    throw new Exception("incorrect op: " + op);
+            }
+            continue;
+        }
+        else
+        {
+            found = op switch
+            {
+                '<' => catVals.Item1 < val,
+                '>' => catVals.Item1 > val,
+                _ => throw new Exception("incorrect op: " + op),
+            };
+            if (found)
+            {
+                newFlow = curRules[i].Split(':')[1];
+                if (newFlow == "A")
+                {
+                    Console.WriteLine("found");
+                    foreach ((int, int) v in range)
+                    {
+                        Console.Write(v + " ");
+                    }
+                    Console.WriteLine();
+                    output.Add(range);
+                }
+                else if (newFlow == "R")
+                {
+                    continue;
+                }
+                else
+                {
+                    List<List<(int, int)>> curOutput = GetRanges(range, workflowRules.FindIndex(x => x[0] == newFlow));
+                    foreach (List<(int, int)> r in curOutput)
+                    {
+                        output.Add(r);
+                    }
+                }
+            }
+            else
+            {
+                continue;
+            }
+        }
+    }
+
+    return output;
+}
+
+static int CharToCat(char c)
+{
+    var cat = c switch
+    {
+        'x' => 0,
+        'm' => 1,
+        'a' => 2,
+        's' => 3,
+        _ => throw new Exception("incorrect chartocat: " + c),
+    };
+    return cat;
+}
 
 /*List<List<int>> rateVals = [];
 foreach (string line in ratings)
@@ -119,16 +317,3 @@ foreach (List<int> part in rateVals)
 }
 
 Console.WriteLine(total);*/
-
-static int CharToCat(char c)
-{
-    var cat = c switch
-    {
-        'x' => 0,
-        'm' => 1,
-        'a' => 2,
-        's' => 3,
-        _ => throw new Exception("incorrect chartocat: " + c),
-    };
-    return cat;
-}
