@@ -24,7 +24,8 @@ main :: proc() {
         if (
             out_buffer[0] == 0 &&
             out_buffer[1] == 0 &&
-            (out_buffer[2] & 0xF0) == 0
+            //(out_buffer[2] & 0xF0) == 0
+            out_buffer[2] == 0
         ) {
             break
         }
