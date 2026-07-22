@@ -10,10 +10,12 @@ main :: proc() {
     defer delete(data, context.allocator)
 
     areas: [3]int
-    total := 0
+    totalArea := 0
+    totalLength := 0
     it := string(data)
 
     for line in strings.split_lines_iterator(&it) {
+
         dimensions := strings.split(line, "x")
         l, _ := strconv.parse_int(dimensions[0])
         w, _ := strconv.parse_int(dimensions[1])
@@ -24,10 +26,20 @@ main :: proc() {
         areas[1] = l * h
         areas[2] = w * h
 
-        total += (
+        totalArea += (
             min(areas[0], areas[1], areas[2]) + 
             (2 * (areas[0] + areas[1] + areas[2]))
         )
+
+        totalLength += (
+            2 * min(
+                l + w,
+                l + h,
+                w + h
+            ) +
+            l * w * h
+        )
     }
-    fmt.println(total)
+    fmt.println("Area:", totalArea)
+    fmt.println("Length:", totalLength)
 }
