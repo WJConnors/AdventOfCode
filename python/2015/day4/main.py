@@ -17,7 +17,7 @@ while not (part_one_found and part_two_found):
 
     if not part_two_found:
        if digest.startswith(b"\x00\x00\x00"):
-           print("Part 1:", num)
+           print("Part 2:", num)
            part_two_found = True           
 
     num += 1
