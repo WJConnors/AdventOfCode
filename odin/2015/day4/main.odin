@@ -9,12 +9,12 @@ input :: "yzbqklnj"
 main :: proc() {
     in_buffer: [32]u8
     out_buffer: [16]u8
-    num: i64 = 1
+    num: u64 = 1
 
     input_len := copy(in_buffer[:], input)
 
     for {
-        num_len := len(strconv.write_int(in_buffer[input_len:], num, 10))
+        num_len := len(strconv.write_uint(in_buffer[input_len:], num, 10))
         hash.hash_bytes_to_buffer(
             .Insecure_MD5,
             in_buffer[:input_len + num_len],
