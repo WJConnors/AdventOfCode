@@ -5,6 +5,7 @@ import "core:os"
 import "core:strings"
 import "core:strconv"
 import "core:slice"
+import "core:math"
 
 Command :: enum{toggle, on, off}
 Point :: struct{x, y: int}
@@ -44,7 +45,34 @@ main :: proc() {
     data, _ := os.read_entire_file("input", context.allocator)
     defer delete (data, context.allocator)
 
-    lights:= make([]bool, 1000 * 1000)
+    lights := make([]int, 1000 * 1000)
+    defer delete(lights)
+
+    light_count := 0
+    it := string(data)
+    for line in strings.split_lines_iterator(&it) {
+        command, pos1, pos2 := parse_line(line)
+
+        change := 0
+        switch command {
+        case .toggle:
+            change = 2
+        case .on:
+            change = 1
+        case .off:
+            change = -1
+        }
+        
+        for y in pos1.y..=pos2.y {
+            col_index := y * 1000
+            for x in pos1.x..=pos2.x {
+                lights[col_index + x] = clamp(lights[col_index + x] + change, 0, max(int))
+            }
+        }
+    }
+    fmt.println(math.sum(lights))
+
+    /*lights := make([]bool, 1000 * 1000)
     defer delete(lights)
 
     it := string(data)
@@ -68,5 +96,5 @@ main :: proc() {
             }
         }
     }
-    fmt.println(slice.count(lights, true))
+    fmt.println(slice.count(lights, true))*/
 }
