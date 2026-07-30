@@ -6,6 +6,7 @@ import "core:strings"
 import "core:strconv"
 import "core:slice"
 import "core:math"
+import "core:simd"
 
 Command :: enum{toggle, on, off}
 Point :: struct{x, y: int}
@@ -45,7 +46,63 @@ main :: proc() {
     data, _ := os.read_entire_file("input", context.allocator)
     defer delete (data, context.allocator)
 
-    lights := make([]int, 1000 * 1000)
+    lights := make([]u16, 1000 * 1000)
+    defer delete(lights)
+
+    Vec :: simd.u16x16
+    LANES :: 16
+    Chunk :: [LANES]u16
+    
+    light_count := 0
+    it := string(data)
+    for line in strings.split_lines_iterator(&it) {
+        command, pos1, pos2 := parse_line(line)
+
+        switch command {
+        case .on, .toggle:
+            val: u16 = command == .on ? 1 : 2
+            vec_val := Vec(val)
+            for y in pos1.y..=pos2.y {
+                col_index := y * 1000
+                first_index := col_index + pos1.x
+                last_index := col_index + pos2.x
+                row := lights[first_index:last_index + 1]
+                i := 0
+                for ; i + LANES <= len(row); i += LANES {
+                    chunk_ptr := cast(^Chunk)&row[i]
+                    chunk := simd.from_array(chunk_ptr^)
+                    chunk_ptr^ = simd.to_array(simd.add(chunk, vec_val))
+                }
+                for ; i < len(row) ; i += 1 {
+                    row[i] += val
+                }
+            }
+        case .off:
+            val := Vec(1)
+            for y in pos1.y..=pos2.y {
+                col_index := y * 1000
+                first_index := col_index + pos1.x
+                last_index := col_index + pos2.x
+                row := lights[first_index:last_index + 1]
+                i := 0
+                for ; i + LANES <= len(row); i += LANES {
+                    chunk_ptr := cast(^Chunk)&row[i]
+                    chunk := simd.from_array(chunk_ptr^)
+                    chunk_ptr^ = simd.to_array(simd.saturating_sub(chunk, val))
+                }
+                for ; i < len(row); i += 1 {
+                    if row[i] > 0 do row[i] -= 1
+                }
+            }
+        }
+    }
+    total: u64
+    for brightness in lights {
+        total += u64(brightness)
+    }
+    fmt.println(total)
+
+    /*lights := make([]int, 1000 * 1000)
     defer delete(lights)
 
     light_count := 0
@@ -70,7 +127,7 @@ main :: proc() {
             }
         }
     }
-    fmt.println(math.sum(lights))
+    fmt.println(math.sum(lights))*/
 
     /*lights := make([]bool, 1000 * 1000)
     defer delete(lights)
