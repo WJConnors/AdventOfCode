@@ -5,10 +5,7 @@ import "core:os"
 import "core:strings"
 
 main :: proc() {
-    data, err := os.read_entire_file("input", context.allocator)
-    if err != nil {
-        return
-    }
+    data, _ := os.read_entire_file("input", context.allocator)
     defer delete(data)
 
     //floor := strings.count(text, "(") - strings.count(text, ")")

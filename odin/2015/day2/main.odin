@@ -6,7 +6,7 @@ import "core:os"
 import "core:strings"
 
 main :: proc() {
-    data, err := os.read_entire_file("input", context.allocator)
+    data, _ := os.read_entire_file("input", context.allocator)
     defer delete(data, context.allocator)
 
     areas: [3]int
@@ -27,7 +27,7 @@ main :: proc() {
         areas[2] = w * h
 
         totalArea += (
-            min(areas[0], areas[1], areas[2]) + 
+            min(areas[0], areas[1], areas[2]) +
             (2 * (areas[0] + areas[1] + areas[2]))
         )
 
